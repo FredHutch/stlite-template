@@ -17,12 +17,20 @@
     <div id="root"></div>
     <script src="https://cdn.jsdelivr.net/npm/@stlite/mountable@0.6.0/build/stlite.js"></script>
     <script>
-      fetch('app.py').then(response => {
-        stlite.mount(
-          response.body,
-          document.getElementById("root")
-        );
-      });
+        fetch("app.py")
+            .then((response) => response.text())
+            .then(
+                (app) => stlite.mount(
+                    {
+                        requirements: ["click"],
+                        entrypoint: "app.py",
+                        files: {
+                            "app.py": app
+                        }
+                    },
+                    document.getElementById("root")
+                )
+            );
     </script>
   </body>
 </html>
