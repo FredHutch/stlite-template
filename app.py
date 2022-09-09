@@ -1,97 +1,158 @@
 import streamlit as st
 import numpy as np
 import pandas as pd
-from scipy import stats
+from scipy.cluster import hierarchy
 import plotly.express as px
 
-st.title("Demo - Airway RNAseq Analysis")
+st.title("Demo - Interactive Heatmap")
 
 @st.cache
-def read_counts(nrows, url="https://github.com/BRITE-REU/programming-workshops/raw/master/source/workshops/02_R/files/airway_scaledcounts.csv"):
-
-    df = pd.read_csv(
-        url,
-        nrows=nrows,
-        index_col=0
-    )
-
-    return df
-
-@st.cache
-def read_metadata(url="https://github.com/BRITE-REU/programming-workshops/raw/master/source/workshops/02_R/files/airway_metadata.csv"):
+def read_url(url:str):
 
     return pd.read_csv(
         url,
         index_col=0
     )
 
-@st.cache
-def run_ttest_genes(counts):
-    """Compare the counts for treatments and controls."""
+def plot(
+    counts:pd.DataFrame,
+    top_n=1000,
+    norm="none",
+    method="average",
+    metric="euclidean"
+):
 
-    return counts.apply(
-        run_ttest_single,
-        axis=1
-    ).dropna(
-    ).assign(
-        neg_log_p=lambda d: -d["p"].apply(np.log10)
-    ).reset_index(
+    if norm == "prop":
+        st.text("Values normalized to the proportion of each column")
+        counts = counts / counts.sum()
+    elif norm == "CLR":
+        st.text("Values transformed to the centered-log-transform of each column")
+        counts = counts.applymap(np.log10)
+        gmean = counts.apply(lambda c: c[c > -np.inf].mean())
+        counts = counts / gmean
+        counts = counts.clip(lower=counts.apply(lambda c: c[c > -np.inf].min()).min())
+
+    # Filter by top_n
+    counts = counts.reindex(
+        index=counts.sum(
+            axis=1
+        ).sort_values(
+            ascending=False
+        ).head(
+            int(top_n)
+        ).index.values
     )
 
-# Get the samples from the treatments and controls
-@st.cache
-def get_labels():
+    # Order the rows and columns
+    counts = counts.reindex(
+        index=get_index_order(counts, method=method, metric=metric),
+        columns=get_index_order(counts.T, method=method, metric=metric),
+    )
 
-    metadata = read_metadata()
-
-    return {
-        label: m.index.values
-        for label, m in metadata.groupby("dex")
-    }
-
-def run_ttest_single(r):
-
-    labels = get_labels()
-    
-    return pd.Series(dict(
-        zip(
-            ["stat", "p"],
-            stats.ttest_ind(
-                r.loc[labels["treated"]],
-                r.loc[labels["control"]]
-            )
-        )
-    ))
-
-def plot(stats_df):
-
-    fig = px.scatter(
-        stats_df,
-        x="stat",
-        y="neg_log_p",
-        title="Comparison of genes in treated vs. control",
+    # Make the plot
+    fig = px.imshow(
+        counts,
+        color_continuous_scale='RdBu_r',
+        aspect="auto",
         labels=dict(
-            stat="t-test statistic",
-            neg_log_p="p-value (-log10)",
-        ),
-        hover_data=["ensgene"]
+            color=dict(
+                none="counts",
+                prop="proportion"
+            ).get(norm, norm),
+            x="sample"
+        )
     )
 
     st.plotly_chart(fig)
 
-if __name__ == "__main__":
+def get_index_order(counts, method=None, metric=None):
+    return counts.index.values[
+        hierarchy.leaves_list(
+            hierarchy.linkage(
+                counts.values,
+                method=method,
+                metric=metric
+            )
+        )
+    ]
 
-    counts = read_counts(
-        st.number_input(
-            "Number of genes to test",
-            min_value=100,
-            max_value=38694,
-            step=100,
-            value=100,
-            help="Number of genes to test"
+def run():
+    """Primary entrypoint."""
+
+    # Read the counts specified by the user
+    counts = read_url(
+        st.sidebar.text_input(
+            "Counts Table",
+            value="https://github.com/BRITE-REU/programming-workshops/raw/master/source/workshops/02_R/files/airway_scaledcounts.csv",
+            help="Read the abundance values from a CSV (URL) which contains a header row and index column"
         )
     )
 
-    stats_df = run_ttest_genes(counts)
+    # Render the plot
+    plot(
+        counts,
+        top_n=st.sidebar.number_input(
+            "Show top N rows",
+            help="Only the subset of rows will be shown which have the highest average values",
+            min_value=1000,
+            max_value=counts.shape[0]
+        ),
+        norm=st.sidebar.selectbox(
+            "Normalize values by",
+            help="The raw values in the table can be normalized by the proportion of each column, or by calculating the centered log transform",
+            index=2,
+            options=[
+                "none",
+                "prop",
+                "CLR"
+            ]
+        ),
+        method=st.sidebar.selectbox(
+            "Ordering - method",
+            help="The order of rows will be set by linkage clustering using this method",
+            index=6,
+            options=[
+                "average",
+                "complete",
+                "single",
+                "weighted",
+                "centroid",
+                "median",
+                "ward"
+            ]
+        ),
+        metric=st.sidebar.selectbox(
+            "Ordering - metric",
+            help="The order of rows will be set by linkage clustering using this distance metric",
+            index=7,
+            options=[
+                "braycurtis",
+                "canberra",
+                "chebyshev",
+                "cityblock",
+                "correlation",
+                "cosine",
+                "dice",
+                "euclidean",
+                "hamming",
+                "jaccard",
+                "jensenshannon",
+                "kulczynski1",
+                "mahalanobis",
+                "matching",
+                "minkowski",
+                "rogerstanimoto",
+                "russellrao",
+                "seuclidean",
+                "sokalmichener",
+                "sokalsneath",
+                "sqeuclidean",
+                "yule"
 
-    plot(stats_df)
+           ]
+        ),
+    )
+
+if __name__ == "__main__":
+
+    run()
