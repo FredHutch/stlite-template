@@ -3,14 +3,18 @@ import numpy as np
 import pandas as pd
 from scipy.cluster import hierarchy
 import plotly.express as px
+from pyodide.http import open_url
 
 st.title("Demo - Interactive Heatmap")
 
-@st.cache
+@st.cache(show_spinner=False, max_entries=1)
 def read_url(url:str):
+    """Read the CSV content from a URL"""
 
     return pd.read_csv(
-        url,
+        # Use the pyodide utility to read the URL, because
+        # requests is currently broken
+        open_url(url),
         index_col=0
     )
 
@@ -22,11 +26,15 @@ def plot(
     metric="euclidean"
 ):
 
+    # Make a list of messages to display after the plot
+    msgs = []
+
+    # Normalize the raw input values
     if norm == "prop":
-        st.text("Values normalized to the proportion of each column")
+        msgs.append("Values normalized to the proportion of each column")
         counts = counts / counts.sum()
     elif norm == "CLR":
-        st.text("Values transformed to the centered-log-transform of each column")
+        msgs.append("Values transformed to the centered-log-transform of each column")
         counts = counts.applymap(np.log10)
         gmean = counts.apply(lambda c: c[c > -np.inf].mean())
         counts = counts / gmean
@@ -63,9 +71,16 @@ def plot(
         )
     )
 
+    # Display the plot
     st.plotly_chart(fig)
 
+    # Print the messages below the plot
+    for msg in msgs:
+        st.text(msg)
+
+
 def get_index_order(counts, method=None, metric=None):
+    """Perform linkage clustering and return the ordered index."""
     return counts.index.values[
         hierarchy.leaves_list(
             hierarchy.linkage(
@@ -83,7 +98,7 @@ def run():
     counts = read_url(
         st.sidebar.text_input(
             "Counts Table",
-            value="https://github.com/BRITE-REU/programming-workshops/raw/master/source/workshops/02_R/files/airway_scaledcounts.csv",
+            value="https://raw.githubusercontent.com/BRITE-REU/programming-workshops/master/source/workshops/02_R/files/airway_scaledcounts.csv",
             help="Read the abundance values from a CSV (URL) which contains a header row and index column"
         )
     )
