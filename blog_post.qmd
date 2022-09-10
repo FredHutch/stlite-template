@@ -1,0 +1,12 @@
+---
+title: Python-Based Data Viz (No Installation Required)
+subtitle: Write interactive apps in Python for non-computational users, without having running a persistant server
+format:
+  html:
+    code-fold: false
+jupyter: python3
+theme: journal
+embed-resources: true
+standalone: true
+---
+
