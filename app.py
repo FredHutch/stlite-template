@@ -3,7 +3,11 @@ import numpy as np
 import pandas as pd
 from scipy.cluster import hierarchy
 import plotly.express as px
-from pyodide.http import open_url
+import importlib
+from io import StringIO
+import requests
+if importlib.find_loader("pyodide") is not None:
+    from pyodide.http import open_url
 
 st.title("Demo - Interactive Heatmap")
 
@@ -11,10 +15,17 @@ st.title("Demo - Interactive Heatmap")
 def read_url(url:str):
     """Read the CSV content from a URL"""
 
+    # If pyodide is available
+    if importlib.find_loader("pyodide") is not None:
+        url_contents = open_url(url)
+    else:
+        r = requests.get(url)
+        url_contents = StringIO(r.text)
+
     return pd.read_csv(
         # Use the pyodide utility to read the URL, because
         # requests is currently broken
-        open_url(url),
+        url_contents,
         index_col=0
     )
 
