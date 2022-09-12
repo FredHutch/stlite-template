@@ -6,7 +6,7 @@ import plotly.express as px
 import importlib
 from io import StringIO
 import requests
-if importlib.find_loader("pyodide") is not None:
+if importlib.util.find_spec("pyodide") is not None:
     from pyodide.http import open_url
 
 st.title("Demo - Interactive Heatmap")
@@ -16,7 +16,7 @@ def read_url(url:str):
     """Read the CSV content from a URL"""
 
     # If pyodide is available
-    if importlib.find_loader("pyodide") is not None:
+    if importlib.util.find_spec("pyodide") is not None:
         url_contents = open_url(url)
     else:
         r = requests.get(url)
