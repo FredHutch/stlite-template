@@ -77,6 +77,7 @@ the browser.
 You can make an effective GUI using Python and stlite as long as you remember
 that it is being run directly in the user's browser.
 
+- It will take a minute to load -- your users will benefit from patience;
 - Operations which require a large amount of memory, CPU, or I/O will likely cause problems --
 try to keep the computation as lightweight as possible;
 - Any files which you need to read in must also be available to the user's browser,
