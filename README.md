@@ -118,6 +118,8 @@ interactive data visualization app, you can see that this template
 repository ([FredHutch/stlite-template](https://github.com/FredHutch/stlite-template))
 has been hosted at [https://fredhutch.github.io/stlite-template/](https://fredhutch.github.io/stlite-template/).
 
+[![Demo Screenshot](./img/demo-screenshot.png)](https://fredhutch.github.io/stlite-template/)
+
 ### 1. Fork the template repository
 
 Navigate to the [FredHutch/stlite-template](https://github.com/FredHutch/stlite-template)
