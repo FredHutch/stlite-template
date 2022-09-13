@@ -169,6 +169,9 @@ def read_url(url:str, **kwargs):
 
 ```
 
+Feel free to copy or modify this code as needed to read in the
+data files you may need for your app.
+
 ### 2b. Staging data
 
 The most interesting and useful apps process and transform data in
@@ -193,7 +196,7 @@ So if you want to add some data files which can be read in by the app,
 follow this tutorial through to the end to figure out what URL it
 will be available at, and then update your app to read from that URL.
 
-3. Testing locally
+### 3. Testing locally
 
 Before deploying your app, it is extremely helpful to test it out
 locally.
@@ -217,13 +220,16 @@ open up the JavaScript Console (shown here in Chrome):
 
 ![JavaScript Console in Chrome](./img/chrome-js-console.png)
 
-4. Deploying publicly to the web with GitHub Pages
+### 4. Deploying publicly to the web with GitHub Pages
 
 While there are many ways to deploy a website, I find GitHub Pages
 to be the easiest way to turn a code repository into a public
 webpage.
 Users who pay for Enterprise-level accounts can also create 
 private websites, but anyone can create a public-facing page.
+
+Just to be clear, even if your repository is private the published
+webpage will still be public -- you have been warned.
 
 To deploy to the web:
 
