@@ -24,26 +24,31 @@ by users _without having to install absolutely anything_.
 Working as a bioinformatician, I'm always on the lookout for new tools which can help
 me perform really useful analyses for my collaborators.
 But the decision to adopt a new tool is not purely based on what it can deliver -- 
-I also have to weigh the difficulty of learning to use that new tool.
+I also have to weigh the difficulty of learning it.
 For a long time the world of web development felt like it was out of my reach purely
-based on the apparent difficulty of learning JavaScript alongside HTML/CSS.
+from the apparent difficulty of learning JavaScript alongside HTML/CSS.
 
 While it is true that Python (and R) can both be used to set up interactive
-web apps, those libraries (Flask, Dash, Streamlit, and Shiny) are intended to
-be run on active servers which perform all of the computation and then send the
-results to the user's browser.
+web apps, those libraries (
+[Flask](https://flask.palletsprojects.com/),
+[Dash](https://dash.plotly.com/),
+[Streamlit](https://streamlit.io/), 
+and [Shiny](https://shiny.rstudio.com/)
+) are intended to
+be run on active servers which perform computation on the back-end and then send the
+results to the front-end on the user's browser.
 It is inherently much more difficult to run web apps in this way, both because
 of the expense of keeping a machine constantly running as well as the complexity
 of providing a protected network connection.
 There are some wonderful hosted solutions for sharing R and Python based apps,
-but it's complex enough that I'm not going to set up my own version.
+but it's complex enough that I'm not particularly inclined to set up my own version.
 
 ## How it became possible
 
 The transformational tool which profoundly changed the landscape of software
 development has been [WebAssembly](https://webassembly.org/), which makes it
 possible to compile Python code so that it can be run directly in a web browser.
-Making code which runs in the web browser is fantastic because you no longer have
+Making code which runs in the web browser is **fantastic** because you no longer have
 to ask a user to install any dependencies -- they almost certainly already have
 a web browser.
 
@@ -60,17 +65,28 @@ of [Streamlit](https://streamlit.io/).
 This Python library makes it extremely easy to build a simple GUI which
 drives any sort of data visualization you like.
 There is native integration with multiple powerful plotting libraries
-(PyPlot, Altair, Vega Lite, Plotly, Bokeh, pydeck, and graphviz), as
-well as flexible controls for user input, page layout, and media
-display.
+(
+    [Pyplot](https://matplotlib.org/stable/tutorials/introductory/pyplot.html),
+    [Altair](https://altair-viz.github.io/),
+    [Vega Lite](https://vega.github.io/vega-lite/),
+    [Plotly](https://plotly.com/python/),
+    [Bokeh](https://docs.bokeh.org/en/latest/),
+    [pydeck](https://deckgl.readthedocs.io/en/latest/),
+    and [graphviz](https://graphviz.org/)
+), as
+well as flexible controls for
+[user input](https://docs.streamlit.io/library/api-reference/widgets),
+[page layout](https://docs.streamlit.io/library/api-reference/layout),
+and [media display](https://docs.streamlit.io/library/api-reference/media).
+
 Most importantly the brainspace-overhead is low -- you don't have to learn
-much to get started.
+much to get up and running.
 If you are already working in Python and want to quickly prototype and deploy
 an interactive web app, it is definitely worth your time to explore
 Streamlit.
 
-And now, those Streamlit apps can be served to users and run directly in
-the browser.
+_And now, those Streamlit apps can be served to users and run directly in
+the browser._
 
 ## Intended use and limitations
 
@@ -251,3 +267,4 @@ For example, the template repository `https://github.com/FredHutch/stlite-templa
 Getting back to the explanation of uploading static data files, any
 files which are added to the template repository could be read by
 the app with that URL, e.g. `https://fredhutch.github.io/stlite-template/data_file.csv`.
+
