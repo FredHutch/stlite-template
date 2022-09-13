@@ -268,3 +268,39 @@ Getting back to the explanation of uploading static data files, any
 files which are added to the template repository could be read by
 the app with that URL, e.g. `https://fredhutch.github.io/stlite-template/data_file.csv`.
 
+## Wrapping Up
+
+Now that you've successfully built your first serverless web app, it may be worth
+reflecting on what role GUIs may play in your work, if any at all.
+While it is very appealing to put a tool directly in the hands of your
+user/customer/collaborator, it is also clear that not all tools _should_ be
+put in their hands.
+
+Many tasks in data science require large amount of compute resources, which
+either would take far too long to run on a laptop, or would require access to
+remote resources with robust authorization and authentication controls.
+Other tasks are driven by complex parameter inputs which may not be easy
+to explain to a non-specialist user, or which may return results which are
+difficult to interpret.
+
+The ideal GUI for a web app will provide _responsive_ and _informative_
+visualizations which allow the user to explore and discover in a manner
+which would not be possible with a static image.
+It's worth exploring the opportunities for mouseover data, interactive
+widgets, and any other ways that the rich features and complexities of your
+data can be exposed.
+If you're _really_ successful, someone will figure something out from your
+data which you didn't even realize yourself.
+
+## Acknowledgements
+
+If you found this useful, take a minute to consider all of the people
+who have worked to support the free and open source software projects
+it is based on.
+Also please consider
+[supporting the stlite project](https://github.com/whitphx/stlite#support-the-project)
+to help keep it going.
+In addition to all of the amazing software projects which were referenced
+above, I wanted to acknowledge the contribution of
+[Nathan Thorpe](https://github.com/nathanthorpe), who helped me write
+my first-ever piece of JavaScript.
