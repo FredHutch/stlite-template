@@ -11,8 +11,8 @@ if importlib.util.find_spec("pyodide") is not None:
 
 st.title("Demo - Interactive Heatmap")
 
-@st.cache(show_spinner=False, max_entries=1)
-def read_url(url:str):
+@st.cache(show_spinner=False)
+def read_url(url:str, **kwargs):
     """Read the CSV content from a URL"""
 
     # If pyodide is available
@@ -23,10 +23,8 @@ def read_url(url:str):
         url_contents = StringIO(r.text)
 
     return pd.read_csv(
-        # Use the pyodide utility to read the URL, because
-        # requests is currently broken
         url_contents,
-        index_col=0
+        **kwargs
     )
 
 def plot(
@@ -111,7 +109,8 @@ def run():
             "Counts Table",
             value="https://raw.githubusercontent.com/BRITE-REU/programming-workshops/master/source/workshops/02_R/files/airway_scaledcounts.csv",
             help="Read the abundance values from a CSV (URL) which contains a header row and index column"
-        )
+        ),
+        index_col=0
     )
 
     # Render the plot

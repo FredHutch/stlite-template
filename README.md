@@ -96,6 +96,11 @@ This guide will walk you through:
 To use this guide you should have familiarity with (1) manipulating
 software repositories on GitHub and (2) running Streamlit locally.
 
+To get an idea of how a GitHub repository can be transformed into an
+interactive data visualization app, you can see that this template
+repository ([FredHutch/stlite-template](https://github.com/FredHutch/stlite-template))
+has been hosted at [https://fredhutch.github.io/stlite-template/](https://fredhutch.github.io/stlite-template/).
+
 ### 1. Fork the template repository
 
 Navigate to the [FredHutch/stlite-template](https://github.com/FredHutch/stlite-template)
@@ -106,6 +111,136 @@ something entirely new.
 
 ![fork-repo](./img/fork-repo-screenshot.png)
 
+### 2. Add your Streamlit app
 
-Hosted at [https://fredhutch.github.io/stlite-template/](https://fredhutch.github.io/stlite-template/)
+All of the code needed to run your app should be placed in the repository.
+Depending on what your app does, you may also need to take some additional
+steps:
 
+1. Place all of your Python/streamlit code in the file `app.py`;
+2. Add any libraries which are imported by the app in line 25 of `index.html` (e.g. `requirements: ["click", "scipy", "plotly"],`);
+3. If you have any `@st.cache` decorators in your streamlit app, add the argument `show_spinner=False` (to account for [a known bug in stlite](https://github.com/whitphx/stlite/issues/64))
+
+### 2a. Reading in data
+
+The trickiest part of this process that I ran into was how to read in
+external data sources (e.g. CSV files).
+Luckily, the solution didn't end up being too complex.
+
+The core issue is that the `requests` library isn't currently supported
+in Pyodide.
+This leads to errors when using helpful functions like `pd.read_csv`,
+which use `requests` behind the scenes. 
+Instead, the best way to read in remote files from inside the browser
+(keeping in mind that all files will be remote for your users, even
+any additional files which you set up in your repository) is to use
+the `pyodide.http` library.
+
+However, the `pyodide` library isn't available when testing locally
+inside Python, just as the `requests` library isn't usable when running
+inside the browser.
+
+To account for this, I made a small helper function which reads a CSV
+from a URL using whichever library is appropriate to the execution context:
+
+```{python}
+import streamlit as st
+import importlib
+import requests
+from io import StringIO
+if importlib.util.find_spec("pyodide") is not None:
+    from pyodide.http import open_url
+
+@st.cache(show_spinner=False)
+def read_url(url:str, **kwargs):
+    """Read the CSV content from a URL"""
+
+    # If pyodide is available
+    if importlib.util.find_spec("pyodide") is not None:
+        url_contents = open_url(url)
+    else:
+        r = requests.get(url)
+        url_contents = StringIO(r.text)
+
+    return pd.read_csv(
+        url_contents,
+        **kwargs
+    )
+
+```
+
+### 2b. Staging data
+
+The most interesting and useful apps process and transform data in
+some way for display and interaction with the user.
+When considering how to get data into your app, there are three
+primary options:
+
+1. Use data which is available at a public URL (as shown in
+[the example repository](https://github.com/FredHutch/stlite-template));
+2. Ask the user to upload the file directly using the
+[streamlit file uploader utility](https://docs.streamlit.io/library/api-reference/widgets/st.file_uploader);
+3. Host the data yourself, uploading it to the web in a location which can 
+be accessed by the app.
+
+While hosting the data yourself (option 3) may seem daunting, it is
+actually made extremely easy using the steps outlined below for
+publishing your app using GitHub Pages.
+Once you publish your app to a particular URL, any additional files
+which you've added to your repository will also be available at that
+URL and can be read in by the app.
+So if you want to add some data files which can be read in by the app,
+follow this tutorial through to the end to figure out what URL it
+will be available at, and then update your app to read from that URL.
+
+3. Testing locally
+
+Before deploying your app, it is extremely helpful to test it out
+locally.
+First, you can launch the app using your local copy of Python
+(with streamlit installed) with:
+
+```{shell}
+streamlit run app.py
+```
+
+After debugging any errors which you find, the next step is to
+launch a local web server to test your code directly in the
+browser with:
+
+```{shell}
+python3 -m http.server
+```
+
+When checking for errors in the browser, it is always good to
+open up the JavaScript Console (shown here in Chrome):
+
+![JavaScript Console in Chrome](./img/chrome-js-console.png)
+
+4. Deploying publicly to the web with GitHub Pages
+
+While there are many ways to deploy a website, I find GitHub Pages
+to be the easiest way to turn a code repository into a public
+webpage.
+Users who pay for Enterprise-level accounts can also create 
+private websites, but anyone can create a public-facing page.
+
+To deploy to the web:
+
+1. Navigate to the webpage for your repository (`www.github.com/<ORG>/<REPO>`);
+2. Click on "Settings";
+3. Click on "Pages" (under "Code and automation");
+4. Under "Branch" select "main" (or whichever branch of the repo you would like to set up);
+5. That's it!
+
+![Set up GitHub Pages](./img/setup-gh-pages.png)
+
+You will soon be able to find your webpage at a URL which is
+based on your organization and repository name (although there
+are options to customize the domain name). E.g. `https://<ORG>.github.io/<REPO>/`.
+
+For example, the template repository `https://github.com/FredHutch/stlite-template` is hosted as a webpage at `https://fredhutch.github.io/stlite-template/`.
+
+Getting back to the explanation of uploading static data files, any
+files which are added to the template repository could be read by
+the app with that URL, e.g. `https://fredhutch.github.io/stlite-template/data_file.csv`.
