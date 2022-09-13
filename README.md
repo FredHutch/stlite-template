@@ -120,6 +120,11 @@ has been hosted at [https://fredhutch.github.io/stlite-template/](https://fredhu
 
 [![Demo Screenshot](./img/demo-screenshot.png)](https://fredhutch.github.io/stlite-template/)
 
+The example app in the template reads in a set of RNAseq counts (with data from the
+[BRITE-REU programming workshops](https://github.com/BRITE-REU/programming-workshops)),
+normalizes the data by CLR or proportional abundance, performs linkage clustering on
+the rows and columns, and displays an interactive heatmap to the user.
+
 ### 1. Fork the template repository
 
 Navigate to the [FredHutch/stlite-template](https://github.com/FredHutch/stlite-template)
