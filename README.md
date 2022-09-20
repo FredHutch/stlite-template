@@ -142,7 +142,7 @@ Depending on what your app does, you may also need to take some additional
 steps:
 
 1. Place all of your Python/streamlit code in the file `app.py`;
-2. Add any libraries which are imported by the app in line 25 of `index.html` (e.g. `requirements: ["click", "scipy", "plotly"],`);
+2. Add any libraries which are imported by the app in line 38 of `index.html` (e.g. `requirements: ["click", "scipy", "plotly"],`);
 3. If you have any `@st.cache` decorators in your streamlit app, add the argument `show_spinner=False` (to account for [a known bug in stlite](https://github.com/whitphx/stlite/issues/64))
 
 ### 2a. Reading in data
